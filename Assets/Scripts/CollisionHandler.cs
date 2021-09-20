@@ -23,14 +23,18 @@ public class CollisionHandler : MonoBehaviour
                 Debug.Log("Congrats!");
                 LoadNextLevel();
                 break;
-            case "Fuel":
-                Debug.Log("Got fuel");
-                break;
             default:
                 Debug.Log("Game Over");
-                ReloadLevel();
+                StartCrashSequence();
                 break;
         }
+    }
+
+    void StartCrashSequence()
+    {
+        GetComponent<PlayerMovement>().enabled = false;
+        GetComponent<AudioSource>().enabled = false;
+        Invoke("ReloadLevel", 1f);
     }
 
     void ReloadLevel()
