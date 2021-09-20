@@ -7,10 +7,12 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float acceleration = 1000f;
     [SerializeField] float rotation = 150f;
     Rigidbody playerRigidbody;
+    AudioSource rocketBoostAudio;
 
     void Start()
     {
         playerRigidbody = GetComponent<Rigidbody>();
+        rocketBoostAudio = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -24,7 +26,15 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKey(KeyCode.Space))
         {
             playerRigidbody.AddRelativeForce(Vector3.up * acceleration * Time.deltaTime);
-        }        
+            if (!rocketBoostAudio.isPlaying)
+            {
+                rocketBoostAudio.Play();
+            }            
+        }
+        else if (Input.GetKeyUp(KeyCode.Space))
+        {
+            rocketBoostAudio.Stop();
+        }
     }
 
     void ProcessRotation()
@@ -39,7 +49,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void ApplyRotation(float rotationAmount)
+    void ApplyRotation(float rotationAmount)    // Rotate the rocket while preventing it to get effected by environment
     {
         playerRigidbody.freezeRotation = true;
         transform.Rotate(Vector3.forward * rotationAmount * Time.deltaTime);
