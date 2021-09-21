@@ -5,23 +5,36 @@ using UnityEngine.SceneManagement;
 
 public class CollisionHandler : MonoBehaviour
 {
-    int currentLevelIndex;
+    [SerializeField] float levelLoadDelay = 1f;
+    [SerializeField] AudioClip crashExplosionAudio;
+    [SerializeField] AudioClip successfulLandingAudio;
+
+    [SerializeField] ParticleSystem crashExplosionParticles;
+    [SerializeField] ParticleSystem successfulLandingParticles;
+
+    AudioSource audioSource;
+
+    bool isTransitioning = false;
+    int currentLevelIndex;    
 
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
+
         currentLevelIndex = SceneManager.GetActiveScene().buildIndex;
     }
 
     void OnCollisionEnter(Collision collision)
     {
+        if (isTransitioning) { return; }
+
         switch (collision.gameObject.tag)
         {
             case "Friendly":
-                Debug.Log("Hit friendly");
                 break;
             case "Finish":
                 Debug.Log("Congrats!");
-                LoadNextLevel();
+                StartSuccessSequence();
                 break;
             default:
                 Debug.Log("Game Over");
@@ -32,9 +45,26 @@ public class CollisionHandler : MonoBehaviour
 
     void StartCrashSequence()
     {
+        isTransitioning = true;
         GetComponent<PlayerMovement>().enabled = false;
-        GetComponent<AudioSource>().enabled = false;
-        Invoke("ReloadLevel", 1f);
+
+        audioSource.Stop();
+        audioSource.PlayOneShot(crashExplosionAudio);
+
+        crashExplosionParticles.Play();
+        Invoke("ReloadLevel", levelLoadDelay);
+    }
+
+    void StartSuccessSequence()
+    {
+        isTransitioning = true;
+        GetComponent<PlayerMovement>().enabled = false;
+
+        audioSource.Stop();
+        audioSource.PlayOneShot(successfulLandingAudio);
+
+        successfulLandingParticles.Play();
+        Invoke("LoadNextLevel", levelLoadDelay);
     }
 
     void ReloadLevel()
@@ -45,7 +75,6 @@ public class CollisionHandler : MonoBehaviour
     void LoadNextLevel()
     {
         int nextLevelIndex = currentLevelIndex + 1;
-
         if (nextLevelIndex == SceneManager.sceneCountInBuildSettings)
         {
             nextLevelIndex = 0;
