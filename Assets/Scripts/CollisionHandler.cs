@@ -24,6 +24,27 @@ public class CollisionHandler : MonoBehaviour
         currentLevelIndex = SceneManager.GetActiveScene().buildIndex;
     }
 
+    void Update()
+    {
+        ActionShortcuts();
+    }
+
+    private void ActionShortcuts()
+    {
+        if (Input.GetKeyUp(KeyCode.L))
+        {
+            LoadNextLevel();
+        }
+
+        if (Input.GetKeyUp(KeyCode.C))
+        {
+            if (!isTransitioning)
+                isTransitioning = true;
+            else if (isTransitioning)
+                isTransitioning = false;
+        }
+    }
+
     void OnCollisionEnter(Collision collision)
     {
         if (isTransitioning) { return; }
@@ -55,6 +76,11 @@ public class CollisionHandler : MonoBehaviour
         Invoke("ReloadLevel", levelLoadDelay);
     }
 
+    void ReloadLevel()
+    {
+        SceneManager.LoadScene(currentLevelIndex);
+    }
+
     void StartSuccessSequence()
     {
         isTransitioning = true;
@@ -65,12 +91,7 @@ public class CollisionHandler : MonoBehaviour
 
         successfulLandingParticles.Play();
         Invoke("LoadNextLevel", levelLoadDelay);
-    }
-
-    void ReloadLevel()
-    {
-        SceneManager.LoadScene(currentLevelIndex);
-    }
+    }    
 
     void LoadNextLevel()
     {
