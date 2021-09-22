@@ -54,11 +54,9 @@ public class CollisionHandler : MonoBehaviour
             case "Friendly":
                 break;
             case "Finish":
-                Debug.Log("Congrats!");
                 StartSuccessSequence();
                 break;
             default:
-                Debug.Log("Game Over");
                 StartCrashSequence();
                 break;
         }
